@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .nav{
+      display: flex;
+      width: 500px;
+      height: 50px;
+      background-color: aqua;
+      margin: auto;
+    }
+    .box{
+      width: 500px;
+      /* 超出部分隐藏 */
+      overflow: hidden;
+      margin: auto;
+      display: flex;
+    }
+    .content{
+      width: 500px;
+      height: 600px;
+      flex-shrink: 0;
+    }
+    #content1{
+      background-color: paleturquoise;
+    }
+    #content2{
+      background-color: yellowgreen;
+    }
+    #content3{
+      background-color: peru;
+    }
+  </style>
+</head>
+
+<body>
+<nav>
+  <div class="nav">
+    <a href="#content1" id="nav1">首页</a>
+    <a href="#content2" id="nav2">详情</a>
+    <a href="#content3" id="nav3">个人中心</a>
+  </div>
+</nav>
+<section>
+  <div class="box">
+
+  </div>
+</section>
+<script>
+  document.getElementById('nav1').addEventListener('click', function() {
+    window.location.hash = 'content1';
+  });
+
+  document.getElementById('nav2').addEventListener('click', function() {
+    window.location.href = 'http://localhost:9001/index.html';
+  });
+
+  document.getElementById('nav3').addEventListener('click', function() {
+    window.location.hash = 'content3';
+  });
+
+</script>
+</body>
+
+</html>

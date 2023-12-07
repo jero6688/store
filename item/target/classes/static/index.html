@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>element test</title>
+    <script src="https://cdn.staticfile.org/vue/2.6.14/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <el-table
+            v-model="item"
+            :data="tableData"
+            style="width: 100%"
+            :row-class-name="tableRowClassName"
+            height="350"
+            align="center"
+            border
+            style="width: 100%"
+    >
+        <el-table-column
+                type="index"
+                width="50"
+        ></el-table-column>
+        <el-table-column
+                prop="id"
+                label="id"
+        ></el-table-column>
+        <el-table-column
+                prop="name"
+                label="name"
+        ></el-table-column>
+        <el-table-column
+                prop="price"
+                label="price"
+        ></el-table-column>
+        <el-table-column
+                prop="type"
+                label="type"
+        ></el-table-column>
+        <el-table-column
+                prop="storage"
+                label="storage"
+        ></el-table-column>
+        <el-table-column
+                label="操作"
+        >
+            <template slot-scope="scope">
+                <el-button
+                        size="mini"
+                        @click="handleEdit(scope.$index, scope.row)">编辑
+                </el-button>
+                <el-button
+                        size="mini"
+                        type="danger"
+                        @click="handleDelete(scope.$index, scope.row)">删除
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+</div>
+</div>
+<script>
+    new Vue({
+        el: '#app',
+        mounted() {
+            this.findAll();
+        },
+        data() {
+            return {
+                item: {
+                    id: '',
+                    name: '',
+                    price: '',
+                    type: '',
+                    storage: ''
+                },
+                tableData: []
+            }
+        },
+        methods: {
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex === 1) {
+                    return 'warning-row';
+                } else if (rowIndex === 3) {
+                    return 'success-row';
+                }
+                return '';
+            },
+            handleEdit(index, row) {
+                console.log(index, row);
+                console.log(row.id);
+            },
+            handleDelete(index, row) {
+                var _this = this;
+                console.log("deleteee");
+                axios({
+                    method: "delete",
+                    url: "http://localhost:9001/item/delete/" + row.id
+                }).then(function (resp) {
+                    _this.findAll();
+                });
+                console.log(row.id);
+            },
+            findAll() {
+                var _this = this;
+                axios({
+                    method: "get",
+                    url: "http://localhost:9001/item/findAll"
+                }).then(function (resp) {
+                    _this.tableData = resp.data;
+                });
+                console.log(this.item.id);
+            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.html</title>
+</head>
+<body>
+<button id="helloBtn">Hello</button>
+<div id="main"></div>
+
+<script>
+    document.getElementById('helloBtn').addEventListener('click', function() {
+        fetch('http://localhost:9001/index.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('main').innerHTML = data;
+            });
+    });
+</script>
+</body>
+</html>
