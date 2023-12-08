@@ -9,5 +9,4 @@ public class Item {
     String type;
     int price;
     int storage;
-    int uid;
 }
