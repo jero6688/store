@@ -33,6 +33,11 @@ public class ItemService {
         return true;
     }
 
+    public List<Item> findByName(String name) {
+        List<Item> items = itemMapper.findByName(name);
+        return items;
+    }
+
     public int deleteByIds(int[] ids){
         itemMapper.deleteByIds(ids);
         return 1;

@@ -32,9 +32,15 @@ public class ItemController {
     }
 
     @GetMapping("/selectById/{id}")
-    public Object selectById(@PathVariable("id") Integer id) {
+    public Item selectById(@PathVariable("id") Integer id) {
         Item item = itemService.selectById(id);
         return item;
+    }
+
+    @GetMapping("/selectByName/{name}")
+    public List<Item> findByName(@PathVariable("name") String name) {
+        List<Item> items = itemService.findByName(name);
+        return items;
     }
 
     @PutMapping("updata")

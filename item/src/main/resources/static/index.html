@@ -24,6 +24,8 @@
     <h1>商品管理</h1>
 </div>
 <div id="app">
+    <el-input placeholder="商品名字" v-model="searchName" style="width: 200px;"></el-input>
+    <el-button @click="findByName()" class="dalfBut">查询</el-button>
     <el-button type="primary" class="butT" @click="handleCreate()">新建</el-button>
     <el-table
             v-model="item"
@@ -165,6 +167,7 @@
             this.findAll();
         },
         data: {
+            searchName: '',
             item: {
                     id: '',
                     name: '',
@@ -290,6 +293,15 @@
                     });
                 }).catch(() => {
                     this.$message.info("当前操作取消");
+                });
+            },
+            findByName() {
+                var _this = this;
+                axios({
+                    method: "get",
+                    url: "http://localhost:9001/item/selectByName/"+this.searchName
+                }).then(function (resp) {
+                    _this.tableData = resp.data;
                 });
             },
             findAll() {

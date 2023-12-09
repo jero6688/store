@@ -25,4 +25,7 @@ public interface ItemMapper {
 
     void deleteByIds(@Param("ids") int[] ids);
 
+    @Select("SELECT * FROM item WHERE name LIKE CONCAT(CONCAT('%', #{name}), '%')")
+    List<Item> findByName(String name);
+
 }
