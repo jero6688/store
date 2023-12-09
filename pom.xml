@@ -8,6 +8,7 @@
     <artifactId>store</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
+        <module>user</module>
     </modules>
 
     <packaging>pom</packaging>
