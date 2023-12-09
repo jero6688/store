@@ -28,9 +28,9 @@ public class ItemService {
         return true;
     }
 
-    public int update(Item item){
+    public boolean update(Item item){
         itemMapper.updateById(item);
-        return 1;
+        return true;
     }
 
     public int deleteByIds(int[] ids){

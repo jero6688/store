@@ -109,6 +109,53 @@
             </div>
         </el-dialog>
     </div>
+<!--编辑表单-->
+    <div class="add-form">
+        <el-dialog title="编辑商品" :visible.sync="dialogFormVisible4Edit">
+            <el-form ref="dataEditForm" :model="formData" :rules="rules" label-position="right"
+                     label-width="100px">
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="商品编号" prop="id">
+                            <el-input v-model="formData.id"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="商品名字" prop="name">
+                            <el-input v-model="formData.name"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="商品价格" prop="price">
+                            <el-input v-model="formData.price"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="商品类型" prop="type">
+                            <el-input v-model="formData.type"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="库存" prop="storage">
+                            <el-input v-model="formData.storage"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="cancel()">取消</el-button>
+                <el-button type="primary" @click="handleUpdate()">确定</el-button>
+            </div>
+        </el-dialog>
+    </div>
 </div>
 </div>
 <script>
@@ -178,13 +225,53 @@
                 this.dialogFormVisible4Edit = false;
                 this.$message.info("当前操作取消");
             },
-            handleEdit(index, row) {
-                console.log(index, row);
-                console.log(row.id);
+
+            //弹出“编辑”窗口并回显数据
+            handleEdit(index,row) {
+                var _this=this;
+                console.log(index)
+                console.log(row.id)
+                axios({
+                    method:"get",
+                    url:"http://localhost:9001/item/selectById/" + row.id
+                }).then(function (resp) {
+                    if(resp.data != null){
+                        //打开弹层
+                        _this.dialogFormVisible4Edit = true;
+                        _this.formData = resp.data;
+                    }
+                    else{
+                        _this.$message.error("出错啦！！");
+                    }
+                }).finally(() => {
+                    //2.重新加载数据
+                    this.findAll();
+                });
+            },
+
+            //确认修改
+            handleUpdate() {
+                axios.put("/item/updata", this.formData).then((res) => {
+                    //判断当前操作是否成功
+                    if(res.data)
+                    {
+                        //1.关闭弹层
+                        this.dialogFormVisible4Edit = false;
+                        this.$message.success("BinGuo!修改成功");
+                    }
+                    else
+                    {
+                        this.$message.error("出错啦！！");
+                    }
+                }).finally(() => {
+                    //2.重新加载数据
+                    this.findAll();
+                });
             },
 
             // 弹出“删除”确认框
             handleDelete(index,row) {
+                console.log(row.id)
                 this.$confirm("此操作永久删除当前信息，是否继续？", "提示", {type: "info"}).then(() => {
                    axios({
                        method: "delete",

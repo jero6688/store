@@ -27,16 +27,21 @@ public class ItemController {
     @DeleteMapping("/delete/{id}")
     public boolean delete(@PathVariable("id") Integer id) {
         boolean flag=itemService.delete(id);
-        System.out.println("调用了");
+        System.out.println("调用了delete");
         return flag;
     }
 
-    @GetMapping("selectById/{id}")
-    public void selectById(@PathVariable("id") int id) {
+    @GetMapping("/selectById/{id}")
+    public Object selectById(@PathVariable("id") Integer id) {
         Item item = itemService.selectById(id);
-        System.out.println("selectOne");
+        return item;
     }
 
+    @PutMapping("updata")
+    public boolean updata(@RequestBody Item item){
+        System.out.println("use selectone");
+        return itemService.update(item);
+    }
     @PostMapping("/deleteByIds")
     public int deleteByIds(@RequestBody int[] ids) {
         return itemService.deleteByIds(ids);
