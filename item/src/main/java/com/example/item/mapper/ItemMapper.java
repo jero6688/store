@@ -3,6 +3,7 @@ package com.example.item.mapper;
 import com.example.item.pojo.Item;
 import org.apache.ibatis.annotations.*;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -22,7 +23,6 @@ public interface ItemMapper {
     @Update("UPDATE ITEM SET name=#{name}, type=#{type}, price=#{price}, storage=#{storage} WHERE id=#{id}")
     void updateById(Item item);
 
-    @Delete("DELETE FROM ITEM WHERE id IN (#{ids})")
-    void deleteByIds(int[] ids);
+    void deleteByIds(@Param("ids") int[] ids);
 
 }

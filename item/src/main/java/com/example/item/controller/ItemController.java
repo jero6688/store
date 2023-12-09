@@ -1,15 +1,10 @@
 package com.example.item.controller;
 
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.example.item.controller.utils.R;
 import com.example.item.pojo.Item;
 import com.example.item.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -24,17 +19,22 @@ public class ItemController {
         return items;
     }
 
+    @PostMapping("add")
+    public R addItem(@RequestBody Item item){
+        boolean flag=itemService.add(item);
+        return new R(flag, flag ? "添加成功^_^" : "添加失败-_-!");
+    }
     @DeleteMapping("/delete/{id}")
-    public void delete(@PathVariable("id") int id) {
-        itemService.delete(id);
-        System.out.println("item delete");
+    public boolean delete(@PathVariable("id") Integer id) {
+        boolean flag=itemService.delete(id);
+        System.out.println("调用了");
+        return flag;
     }
 
     @GetMapping("selectById/{id}")
-    public Item selectById(@PathVariable("id") int id) {
+    public void selectById(@PathVariable("id") int id) {
         Item item = itemService.selectById(id);
         System.out.println("selectOne");
-        return item;
     }
 
     @PostMapping("/deleteByIds")

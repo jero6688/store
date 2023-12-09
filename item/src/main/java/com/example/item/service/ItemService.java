@@ -4,7 +4,6 @@ import com.example.item.mapper.ItemMapper;
 import com.example.item.pojo.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 @Service
 public class ItemService {
@@ -14,18 +13,19 @@ public class ItemService {
         List<Item> items = itemMapper.findAll();
         return items;
     }
-    public void delete(int id){
+    public boolean delete(int id){
         itemMapper.delete(id);
+        return true;
     }
 
     public Item selectById(int id){
-        Item item = itemMapper.selectById(id);
-        return item;
+       return itemMapper.selectById(id);
+
     }
 
-    public int add(Item item){
+    public boolean add(Item item){
         itemMapper.insert(item);
-        return 1;
+        return true;
     }
 
     public int update(Item item){

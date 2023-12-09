@@ -7,10 +7,24 @@
     <script src="https://cdn.staticfile.org/vue/2.6.14/vue.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+    <style>
+        .el-table .warning-row {
+            background: oldlace;
+        }
+
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
+    </style>
 </head>
 <body>
+<div class="content-header">
+    <h1>商品管理</h1>
+</div>
 <div id="app">
+    <el-button type="primary" class="butT" @click="handleCreate()">新建</el-button>
     <el-table
             v-model="item"
             :data="tableData"
@@ -19,35 +33,28 @@
             height="350"
             align="center"
             border
-            style="width: 100%"
-    >
-        <el-table-column
-                type="index"
-                width="50"
-        ></el-table-column>
+            style="width: 100%">
         <el-table-column
                 prop="id"
-                label="id"
-        ></el-table-column>
+                label="id">
+        </el-table-column>
         <el-table-column
                 prop="name"
-                label="name"
-        ></el-table-column>
+                label="name">
+        </el-table-column>
         <el-table-column
                 prop="price"
-                label="price"
-        ></el-table-column>
+                label="price">
+        </el-table-column>
         <el-table-column
                 prop="type"
-                label="type"
-        ></el-table-column>
+                label="type">
+        </el-table-column>
         <el-table-column
                 prop="storage"
-                label="storage"
-        ></el-table-column>
-        <el-table-column
-                label="操作"
-        >
+                label="storage">
+        </el-table-column>
+        <el-table-column label="操作">
             <template slot-scope="scope">
                 <el-button
                         size="mini"
@@ -61,6 +68,47 @@
             </template>
         </el-table-column>
     </el-table>
+
+    <!-- “新建”标签弹层 -->
+    <div class="add-form">
+        <el-dialog title="新增商品" :visible.sync="dialogFormVisible4Add">
+            <el-form ref="dataAddForm" :model="formData" :rules="rules" label-position="right"
+                     label-width="100px">
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="商品名字" prop="name">
+                            <el-input v-model="formData.name"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="价格" prop="price">
+                            <el-input v-model="formData.price"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="类型" prop="type">
+                            <el-input v-model="formData.type"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="库存" prop="storage">
+                            <el-input v-model="formData.storage"/>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="cancel()">取消</el-button>
+                <el-button type="primary" @click="handleAdd()">确定</el-button>
+            </div>
+        </el-dialog>
+    </div>
 </div>
 </div>
 <script>
@@ -69,17 +117,23 @@
         mounted() {
             this.findAll();
         },
-        data() {
-            return {
-                item: {
+        data: {
+            item: {
                     id: '',
                     name: '',
                     price: '',
                     type: '',
                     storage: ''
-                },
-                tableData: []
-            }
+            },
+            tableData: [],
+            dialogFormVisible4Add: false,      //"新增"表单是否可见
+            dialogFormVisible4Edit: false,     //"编辑"表单是否可见
+            formData: {},    //表单数据
+            rules: {         //表单数据校验规则
+                name: [{required: true, message: '名字为必填项', trigger: 'blur'}],
+                price: [{required: true, message: '价格为必填项', trigger: 'blur'}]
+            },
+
         },
         methods: {
             tableRowClassName({row, rowIndex}) {
@@ -90,20 +144,66 @@
                 }
                 return '';
             },
+            //弹出"新建"窗口
+            handleCreate() {
+                this.dialogFormVisible4Add = true;
+                this.resetForm();
+            },
+
+            //重置表单
+            resetForm() {
+                this.formData = {};
+            },
+
+            //确认添加
+            handleAdd() {
+                axios.post("/item/add", this.formData).then((res) => {
+                    //判断当前操作是否成功
+                    if(res.data.flag){
+                        //1.关闭弹层
+                        this.dialogFormVisible4Add = false;
+                        this.$message.success(res.data.msg);
+                    }
+                    else{
+                        this.$message.error(res.data.msg);
+                    }}).finally(() => {
+                    //2.重新加载数据
+                    this.findAll();
+                });
+            },
+
+            //取消
+            cancel() {
+                this.dialogFormVisible4Add = false;
+                this.dialogFormVisible4Edit = false;
+                this.$message.info("当前操作取消");
+            },
             handleEdit(index, row) {
                 console.log(index, row);
                 console.log(row.id);
             },
-            handleDelete(index, row) {
-                var _this = this;
-                console.log("deleteee");
-                axios({
-                    method: "delete",
-                    url: "http://localhost:9001/item/delete/" + row.id
-                }).then(function (resp) {
-                    _this.findAll();
+
+            // 弹出“删除”确认框
+            handleDelete(index,row) {
+                this.$confirm("此操作永久删除当前信息，是否继续？", "提示", {type: "info"}).then(() => {
+                   axios({
+                       method: "delete",
+                       url: "http://localhost:9001/item/delete/" + row.id
+                   }).then((res) => {
+                        console.log(row.id);
+                        if(res){
+                            this.$message.success("BinGuo!!删除成功");
+                        }
+                        else{
+                            this.$message.error("删除失败。。");
+                        }
+                    }).finally(() => {
+                        //2.重新加载数据
+                        this.findAll();
+                    });
+                }).catch(() => {
+                    this.$message.info("当前操作取消");
                 });
-                console.log(row.id);
             },
             findAll() {
                 var _this = this;
