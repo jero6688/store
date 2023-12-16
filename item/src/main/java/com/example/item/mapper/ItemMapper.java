@@ -1,6 +1,7 @@
 package com.example.item.mapper;
 
 import com.example.item.pojo.Item;
+
 import org.apache.ibatis.annotations.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,8 +10,13 @@ import java.util.List;
 
 @Mapper
 public interface ItemMapper {
-    @Select("SELECT * FROM item")
-    List<Item> findAll();
+
+    @Select("SELECT * FROM item LIMIT #{offset}, #{limit}")
+    List<Item> findAll(@Param("offset") int offset, @Param("limit") int limit);
+
+    @Select("select count(*) from item")
+    Integer searchCount();
+
     @Delete("DELETE FROM item WHERE id=#{id}")
     void delete(int id);
 

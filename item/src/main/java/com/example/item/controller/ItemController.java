@@ -3,6 +3,7 @@ package com.example.item.controller;
 import com.example.item.controller.utils.R;
 import com.example.item.pojo.Item;
 import com.example.item.service.ItemService;
+import com.example.item.service.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -14,9 +15,11 @@ public class ItemController {
     private ItemService itemService;
 
     @GetMapping("findAll")
-    public List<Item> findAll() {
-        List<Item> items = itemService.findAll();
-        return items;
+    public PageResult<Item> findAll(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
+        List<Item> items = itemService.findAll(page, size);
+        int count = itemService.searchCount();
+        PageResult<Item> pageResult = new PageResult<>(items, count);
+        return pageResult;
     }
 
     @PostMapping("add")

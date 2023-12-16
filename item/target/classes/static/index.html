@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>element test</title>
-    <script src="https://cdn.staticfile.org/vue/2.6.14/vue.min.js"></script>
+ <!--   <script src="https://cdn.staticfile.org/vue/2.6.14/vue.min.js"></script>-->
+    <script src="../js/vue.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="element-ui/lib/index.js"></script>
-    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
     <style>
         .el-table .warning-row {
@@ -32,45 +32,30 @@
             :data="tableData"
             style="width: 100%"
             :row-class-name="tableRowClassName"
-            height="350"
             align="center"
             border
             style="width: 100%">
-        <el-table-column
-                prop="id"
-                label="id">
-        </el-table-column>
-        <el-table-column
-                prop="name"
-                label="name">
-        </el-table-column>
-        <el-table-column
-                prop="price"
-                label="price">
-        </el-table-column>
-        <el-table-column
-                prop="type"
-                label="type">
-        </el-table-column>
-        <el-table-column
-                prop="storage"
-                label="storage">
-        </el-table-column>
+        <el-table-column prop="id" label="id"></el-table-column>
+        <el-table-column prop="name" label="name"></el-table-column>
+        <el-table-column prop="price" label="price"></el-table-column>
+        <el-table-column prop="type" label="type"></el-table-column>
+        <el-table-column prop="storage" label="storage"></el-table-column>
         <el-table-column label="操作">
             <template slot-scope="scope">
-                <el-button
-                        size="mini"
-                        @click="handleEdit(scope.$index, scope.row)">编辑
-                </el-button>
-                <el-button
-                        size="mini"
-                        type="danger"
-                        @click="handleDelete(scope.$index, scope.row)">删除
-                </el-button>
+                <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
             </template>
         </el-table-column>
     </el-table>
-
+    <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-sizes="[10, 20, 30, 40]"
+            :page-size="10"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="totalItems">
+    </el-pagination>
     <!-- “新建”标签弹层 -->
     <div class="add-form">
         <el-dialog title="新增商品" :visible.sync="dialogFormVisible4Add">
@@ -111,7 +96,7 @@
             </div>
         </el-dialog>
     </div>
-<!--编辑表单-->
+    <!--编辑表单-->
     <div class="add-form">
         <el-dialog title="编辑商品" :visible.sync="dialogFormVisible4Edit">
             <el-form ref="dataEditForm" :model="formData" :rules="rules" label-position="right"
@@ -159,7 +144,6 @@
         </el-dialog>
     </div>
 </div>
-</div>
 <script>
     new Vue({
         el: '#app',
@@ -167,13 +151,17 @@
             this.findAll();
         },
         data: {
+            currentPage: 1,
+            pageSize:10,
+            totalItems:0,
+
             searchName: '',
             item: {
-                    id: '',
-                    name: '',
-                    price: '',
-                    type: '',
-                    storage: ''
+                id: '',
+                name: '',
+                price: '',
+                type: '',
+                storage: ''
             },
             tableData: [],
             dialogFormVisible4Add: false,      //"新增"表单是否可见
@@ -193,6 +181,17 @@
                     return 'success-row';
                 }
                 return '';
+            },
+            //分页
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+                this.pageSize=val;
+                this.findAll();
+            },
+            handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+                this.currentPage=val;
+                this.findAll();
             },
             //弹出"新建"窗口
             handleCreate() {
@@ -276,10 +275,10 @@
             handleDelete(index,row) {
                 console.log(row.id)
                 this.$confirm("此操作永久删除当前信息，是否继续？", "提示", {type: "info"}).then(() => {
-                   axios({
-                       method: "delete",
-                       url: "http://localhost:9001/item/delete/" + row.id
-                   }).then((res) => {
+                    axios({
+                        method: "delete",
+                        url: "http://localhost:9001/item/delete/" + row.id
+                    }).then((res) => {
                         console.log(row.id);
                         if(res){
                             this.$message.success("BinGuo!!删除成功");
@@ -305,14 +304,15 @@
                 });
             },
             findAll() {
-                var _this = this;
-                axios({
-                    method: "get",
-                    url: "http://localhost:9001/item/findAll"
-                }).then(function (resp) {
-                    _this.tableData = resp.data;
-                });
-                console.log(this.item.id);
+                // 发送分页查询请求
+                axios.get(`/item/findAll?page=${this.currentPage}&size=${this.pageSize}`)
+                    .then(response => {
+                        this.tableData = response.data.items;
+                        this.totalItems = response.data.total;
+                    })
+                    .catch(error => {
+                        console.error('发生错误:', error);
+                    });
             }
         }
     });
